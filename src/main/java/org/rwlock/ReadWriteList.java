@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.TimeUnit;
 
 public class ReadWriteList<E> {
 
@@ -18,12 +19,13 @@ public class ReadWriteList<E> {
 
     public void add(E element) {
         Lock writeLock = rwLock.writeLock();
-        writeLock.lock();
 
-        try {
-            list.add(element);
-        } finally {
-            writeLock.unlock();
+        if (writeLock.tryLock()) {
+            try {
+                list.add(element);
+            } finally {
+                writeLock.unlock();
+            }
         }
     }
 
